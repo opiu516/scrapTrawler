@@ -1,0 +1,198 @@
+<canvas id="ctx" width="500" height="550" style="border:1px solid #000000;"></canvas>
+<script src ="JS/Player.js"></script>
+<script src ="JS/Units.js"></script>
+<script src ="JS/Scrap.js"></script>
+<script src ="JS/Enemy.js"></script>
+<script src ="JS/Mine.js"></script>
+<script src ="JS/Button.js"></script>
+<script src ="JS/RedWall.js"></script>
+<script src ="JS/Upgrades.js"></script>
+<script>
+	var ctx = document.getElementById("ctx").getContext("2d"); 
+	ctx.font = '30px Arial';
+	var Clenght = 500,Cheight = 500;
+	var mapLenght = 20,mapHeight = 20;
+	var tileLenght = 50,tileHeight = 50;
+	var map = [
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+	];
+	map.skin = new Image();
+	map.skin.src = "Img/Map.png"
+	map.draw = function(){
+		var x = Clenght/2 - player.x;
+		var y = Cheight/2 - player.y;
+		ctx.drawImage(map.skin,0,0,mapLenght*tileLenght,mapHeight*tileHeight,x,y,mapLenght*tileLenght,mapHeight*tileHeight);
+	}
+	clearmap = function(){
+		for(var i = 0;i < mapHeight; i++)
+			for(var z = 0;z < mapLenght;z++)
+			map[i][z] = 1;
+	}
+	//mathvars
+	
+	var scrapc = 1;
+	
+	//maths
+	IPV = function(pt){
+	var Xcord = Math.floor(pt.x/tileLenght);
+	var Ycord = Math.floor(pt.y/tileHeight);
+	if(Xcord < 20 && Ycord < 20 && Xcord >= 0 && Ycord >= 0){
+	if( map[Ycord][Xcord] == 1) return true;
+	else return false;
+	}
+	else return false;
+	}
+	IPVR = function(obj){
+	//console.log(obj.y + " - y x - " + obj.x);
+	if(map[Math.floor((obj.y + 1)/tileHeight)] [Math.floor((obj.x + 1)/tileLenght)] != 1) return false;
+	//console.log("bottom right check");
+	if(map[Math.floor((obj.y - 1)/tileHeight)] [Math.floor((obj.x + 1)/tileLenght)] != 1) return false;
+	//console.log("top right check");
+	if(map[Math.floor((obj.y - 1)/tileHeight)] [Math.floor((obj.x - 1)/tileLenght)] != 1) return false;
+	//console.log("top left check");
+	if(map[Math.floor((obj.y + 1)/tileHeight)] [Math.floor((obj.x - 1)/tileLenght)] != 1) return false;
+	//console.log("bottom left check");
+	return true;
+	}
+	IPVE = function(unit){
+	 for(var i in enemyList)
+		if(unit.Collision(enemyList[i])) return false;
+		return true;
+	}
+	IPVP = function(unit){
+	 if(unit.Collision(player)) return false;
+		return true;
+	}
+	IPVM = function(unit){
+	for(var i in mineList)
+		if(unit.Collision(mineList[i])) return false;
+		return true;
+	}
+	
+	//movement
+	document.onkeydown = function(event){
+	if(event.keyCode == 37 ){
+		player.Left = true;
+		player.drillDirection = "Left";
+		player.direction = 3;
+		}
+	if(event.keyCode == 39 ){
+		player.Right = true;
+		player.drillDirection = "Right";
+		player.direction = 1;
+		}
+	if(event.keyCode == 38 ){
+		player.Up = true;
+		player.drillDirection = "Up";
+		player.direction = 0;
+		}
+	if(event.keyCode == 40 ){
+		player.Down = true;
+		player.drillDirection = "Down";
+		player.direction = 2;
+		}
+	if(event.keyCode == 90) 
+	if(player.scrap >= 3){
+	makeMine(); 
+	player.scrap -= 3;
+	}
+	if(event.keyCode == 88){
+		player.Drill = true;
+		player.spdX = 1;
+		player.spdY = 1;		
+		}
+	if(event.keyCode == 65) upgrade();//a
+	if(event.keyCode == 83) drillUpgrade();//s
+	}
+	document.onkeyup = function(event){
+	if(event.keyCode == 37 )
+		player.Left = false;
+	if(event.keyCode == 39 )
+		player.Right = false;
+	if(event.keyCode == 38 )
+		player.Up = false;
+	if(event.keyCode == 40 )
+		player.Down = false;
+	if(event.keyCode == 88){
+		player.Drill = false;
+		player.spdX = 5;
+		player.spdY = 5;		
+		}
+	}
+	
+	var player;
+	var wall = unit(5*tileLenght - tileLenght/2,4*tileHeight,tileLenght,8*tileHeight);
+	wall.POM();
+	var  wall2 = unit(5*tileLenght - tileLenght/2,16*tileHeight,tileLenght,8*tileHeight);
+	wall2.POM();
+	var rwb = button(4*tileLenght,7*tileHeight,tileLenght/3,tileHeight);
+	var rwl = redWall(5*tileLenght - tileLenght/2,(mapHeight*tileHeight)/2,tileLenght,4*tileHeight)
+	scrapList = {};
+	enemyList = {};
+	mineList = {};
+	
+	playerup = upgradestruct(3*tileLenght,2*tileHeight,2*tileLenght,2*tileHeight,1)
+	drillup = upgradestruct(1*tileLenght,2*tileHeight,2*tileLenght,2*tileHeight,2)
+	
+	newgame = function(){
+		clearmap();
+		rwl.onof = false;
+		wall.POM();
+		wall2.POM();
+		playerup.POM();
+		drillup.POM();
+		player = makeplayer(2*tileLenght,4*tileHeight,tileLenght,tileHeight,5,5);
+		enemyList = {};
+		mineList = {};
+		generateEnemy();
+		generateEnemy();
+		generateEnemy();
+		scrapList = {};	
+		while(makeScrap() != false ) makeScrap();
+	}
+	
+	update = function(){
+	ctx.clearRect(0,0,Clenght,Cheight);
+	map.draw();
+	scrapc ++;
+	if(scrapc % 125 == 0 ) makeScrap();
+	if(scrapc % 375 == 0 ) generateEnemy();
+	wall.update();
+	wall2.update();
+	playerup.update();
+	drillup.update();
+	for(var i in scrapList)
+		scrapList[i].update();
+	for(var i in enemyList)
+		enemyList[i].update();
+	for(var i in mineList)
+		mineList[i].update();
+	rwb.update();
+	rwl.update();
+	player.update();
+	if(player.hp <= 0 )
+	newgame();
+	}
+	newgame();
+	setInterval(update,40);
+
+</script>
